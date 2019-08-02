@@ -12,9 +12,19 @@
         </el-date-picker>
       </el-col>
       <el-col :span="4">
-        <el-select v-model="type" placeholder="请选择">
+        <el-select v-model="type" placeholder="请选择" @change="getData">
           <el-option
             v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        <el-select v-model="fundid" placeholder="请选择" @change="getData" style="width:100%">
+          <el-option
+            v-for="item in fundIds"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -38,39 +48,122 @@ export default {
   name: 'fund',
   data () {
     return {
+      // 承载echarts的dom
       dom: null,
+      // 原始数据
+      orgData: null,
       dateRange: ['2019-01-01', moment(moment.now()).format('YYYY-MM-DD')],
       type: 0,
+      fundid: 'F00000ZQWJ',
       options: [{
-        label: '万元收益',
+        label: '净值',
         value: 0
       }, {
-        label: '当日年化收益率',
+        label: '万元收益',
         value: 1
+      }, {
+        label: '当日年化收益率',
+        value: 2
+      }, {
+        label: '涨跌幅',
+        value: 3
+      }],
+      fundIds: [{
+        label: '易方达美元货币基金',
+        value: 'F00000ZQWJ'
+      }, {
+        label: '易方达全球债券基金A USD Acc',
+        value: 'F00000YE6M'
+      }, {
+        label: '施羅德環球基金系列－環球收息債券(美元)A-月配固定',
+        value: 'F00000Y909'
       }]
     }
   },
   methods: {
     getData () {
       this.dom.showLoading()
-      api.getCurrentFund(this.dateRange[0], this.dateRange[1], (data) => {
-        let _data = []
+      api.req(this.dateRange[0], this.dateRange[1], this.fundid, (data) => {
         data = data.reverse()
-        for (let i = 0, len = data.length; i < len - 1; i++) {
-          let dur = moment(data[i].EndDate).diff(moment(data[i + 1].EndDate), 'days')
-          _data.push({
-            EndDate: data[i].EndDate,
-            Value: Number(((10000 / data[i + 1].Value) * (data[i].Value - data[i + 1].Value)) / dur).toFixed(2)
-          })
-        }
-        this.renderEcharts(_data)
+        this.orgData = data
+        this.renderEcharts(this.trasnformData(this.type))
       })
     },
+    trasnformData (type) {
+      if (type === 0) {
+        return this.orgData
+      } else if (type === 1) {
+        let _data = []
+        for (let i = 0, len = this.orgData.length; i < len - 1; i++) {
+          let dur = moment(this.orgData[i].EndDate).diff(moment(this.orgData[i + 1].EndDate), 'days')
+          _data.push({
+            EndDate: this.orgData[i].EndDate,
+            ValueDur: Number(((10000 / this.orgData[i + 1].Value) * (this.orgData[i].Value - this.orgData[i + 1].Value)) / dur).toFixed(2),
+            Value: Number(((10000 / this.orgData[i + 1].Value) * (this.orgData[i].Value - this.orgData[i + 1].Value))).toFixed(2)
+          })
+        }
+        return _data
+      } else if (type === 2) {
+        let _data = []
+        for (let i = 0, len = this.orgData.length; i < len - 1; i++) {
+          let dur = moment(this.orgData[i].EndDate).diff(moment(this.orgData[i + 1].EndDate), 'days')
+          _data.push({
+            EndDate: this.orgData[i].EndDate,
+            ValueDur: Number(((10000 / this.orgData[i + 1].Value) * (this.orgData[i].Value - this.orgData[i + 1].Value)) / dur).toFixed(2) * 365 / 10000 * 100,
+            Value: Number(((10000 / this.orgData[i + 1].Value) * (this.orgData[i].Value - this.orgData[i + 1].Value))).toFixed(2) * 365 / 10000 * 100
+          })
+        }
+        return _data
+      } else if (type === 3) {
+        let _data = []
+        for (let i = 1, len = this.orgData.length; i < len - 1; i++) {
+          let dur = moment(this.orgData[i].EndDate).diff(moment(this.orgData[i + 1].EndDate), 'days')
+          _data.push({
+            EndDate: this.orgData[i].EndDate,
+            ValueDur: Number(Number((this.orgData[i].Value - this.orgData[i + 1].Value) / this.orgData[i + 1].Value / dur).toFixed(5) * 100),
+            Value: Number(Number((this.orgData[i].Value - this.orgData[i + 1].Value) / this.orgData[i + 1].Value).toFixed(5) * 100)
+          })
+        }
+        console.log(_data)
+        return _data
+      }
+    },
     renderEcharts (data) {
-      console.log(data)
+      let series = [{
+        data: data.map(ele => {
+          return ele.Value
+        }).reverse(),
+        type: 'line'
+      }]
+      if (this.type === 1 || this.type === 2 || this.type === 3) {
+        series = [{
+          data: data.map(ele => {
+            return ele.Value
+          }).reverse(),
+          type: 'line',
+          name: '原始值'
+        }, {
+          data: data.map(ele => {
+            return ele.ValueDur
+          }).reverse(),
+          type: 'line',
+          name: '均摊值',
+          lineStyle: {
+            color: 'yellow'
+          }
+        }]
+      }
       let option = {
-        tooltip: {
+        legend: {
           show: true
+        },
+        grid: {
+          left: 25,
+          right: 5
+        },
+        tooltip: {
+          show: true,
+          trigger: 'axis'
         },
         xAxis: {
           type: 'category',
@@ -82,27 +175,17 @@ export default {
         yAxis: {
           type: 'value'
         },
-        series: [{
-          data: data.map(ele => {
-            if (this.type === 0) {
-              return ele.Value
-            }
-            if (this.type === 1) {
-              return ele.Value * 365 / 10000 * 100
-            }
-          }).reverse(),
-          type: 'line'
-        }]
+        series: series
       }
       this.dom.setOption(option)
       this.dom.hideLoading()
     },
     query () {
-      this.dom = window.echarts.init(this.$refs.chart)
       this.getData()
     }
   },
   mounted () {
+    this.dom = window.echarts.init(this.$refs.chart)
   }
 }
 </script>

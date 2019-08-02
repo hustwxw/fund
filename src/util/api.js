@@ -12,7 +12,7 @@ let req = (startDate, endDate, id, callback) => {
     console.log(err)
   })
 }
-
+api.req = req
 api.getCurrentFund = (startDate, endDate, callback) => {
   req(startDate, endDate, 'F00000ZQWJ', callback)
 }
