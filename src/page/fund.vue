@@ -116,7 +116,7 @@ export default {
         return _data
       } else if (type === 3) {
         let _data = []
-        for (let i = 1, len = this.orgData.length; i < len - 1; i++) {
+        for (let i = 0, len = this.orgData.length; i < len - 1; i++) {
           let dur = moment(this.orgData[i].EndDate).diff(moment(this.orgData[i + 1].EndDate), 'days')
           _data.push({
             EndDate: this.orgData[i].EndDate,
