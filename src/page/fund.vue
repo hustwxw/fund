@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-date-picker
           v-model="dateRange"
           type="daterange"
@@ -21,7 +21,7 @@
           </el-option>
         </el-select>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-select v-model="fundid" placeholder="请选择" @change="getData" style="width:100%">
           <el-option
             v-for="item in fundIds"
@@ -33,6 +33,9 @@
       </el-col>
       <el-col :span="2">
         <el-button type="primary" @click="query">查询</el-button>
+      </el-col>
+      <el-col :span="3">
+        <el-tag>{{hold}}</el-tag>
       </el-col>
     </el-row>
     <el-row>
@@ -55,7 +58,11 @@ export default {
       dateRange: ['2019-01-01', moment(moment.now()).format('YYYY-MM-DD')],
       type: 0,
       fundid: 'F00000ZQWJ',
+      hold: 0,
       options: [{
+        label: '持有市值',
+        value: -1
+      }, {
         label: '净值',
         value: 0
       }, {
@@ -70,13 +77,14 @@ export default {
       }],
       fundIds: [{
         label: '易方达美元货币基金',
-        value: 'F00000ZQWJ'
+        value: 'F00000ZQWJ',
+        hold: 48.1339,
+        cost: 5000
       }, {
         label: '易方达全球债券基金A USD Acc',
-        value: 'F00000YE6M'
-      }, {
-        label: '施羅德環球基金系列－環球收息債券(美元)A-月配固定',
-        value: 'F00000Y909'
+        value: 'F00000YE6M',
+        hold: 91.9500,
+        cost: 1000
       }]
     }
   },
@@ -90,7 +98,16 @@ export default {
       })
     },
     trasnformData (type) {
-      if (type === 0) {
+      if (type === -1) {
+        let hold = this.fundIds.filter(ele => {
+          return ele.value === this.fundid
+        })[0]
+        this.hold = hold.hold
+        return this.orgData.map(ele => {
+          ele.Value = Number(ele.Value * this.hold - hold.cost).toFixed(2)
+          return ele
+        })
+      } else if (type === 0) {
         return this.orgData
       } else if (type === 1) {
         let _data = []
