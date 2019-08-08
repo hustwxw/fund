@@ -98,13 +98,16 @@ export default {
       })
     },
     trasnformData (type) {
+      let hold = this.fundIds.filter(ele => {
+        return ele.value === this.fundid
+      })[0]
+      this.hold = hold.hold
       if (type === -1) {
-        let hold = this.fundIds.filter(ele => {
-          return ele.value === this.fundid
-        })[0]
-        this.hold = hold.hold
         return this.orgData.map(ele => {
-          ele.Value = Number(ele.Value * this.hold - hold.cost).toFixed(2)
+          console.log(ele)
+          let v = ele.Value * hold.hold
+          ele.Value = Number(v - hold.cost).toFixed(2)
+          ele.ValueCost = Number(v).toFixed(2)
           return ele
         })
       } else if (type === 0) {
@@ -152,6 +155,24 @@ export default {
         }).reverse(),
         type: 'line'
       }]
+      if (this.type === -1) {
+        series = [{
+          data: data.map(ele => {
+            return ele.Value
+          }).reverse(),
+          type: 'line',
+          name: '盈利'
+        }, {
+          data: data.map(ele => {
+            return ele.ValueCost
+          }).reverse(),
+          type: 'line',
+          name: '市值',
+          lineStyle: {
+            color: 'blue'
+          }
+        }]
+      }
       if (this.type === 1 || this.type === 2 || this.type === 3) {
         series = [{
           data: data.map(ele => {
@@ -166,13 +187,13 @@ export default {
           type: 'line',
           name: '均摊值',
           lineStyle: {
-            color: 'yellow'
+            color: 'blue'
           }
         }]
       }
       let option = {
         legend: {
-          show: true
+          show: (this.type !== 0)
         },
         grid: {
           left: 25,
@@ -203,6 +224,7 @@ export default {
   },
   mounted () {
     this.dom = window.echarts.init(this.$refs.chart)
+    this.hold = this.fundIds[0].hold
   }
 }
 </script>
