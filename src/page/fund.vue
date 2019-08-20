@@ -46,6 +46,7 @@
 
 <script>
 import moment from 'moment'
+import _ from 'lodash'
 import api from '@/util/api'
 export default {
   name: 'fund',
@@ -150,6 +151,9 @@ export default {
       }
     },
     renderEcharts (data) {
+      let yAxis = {
+        type: 'value'
+      }
       let series = [{
         data: data.map(ele => {
           return ele.Value
@@ -174,6 +178,17 @@ export default {
           }
         }]
       }
+      if (this.type === 0) {
+        yAxis = {
+          type: 'value',
+          max: _.max(data.map(ele => {
+            return ele.Value
+          }).reverse()) * 1.08,
+          min: _.min(data.map(ele => {
+            return ele.Value
+          }).reverse()) * 0.95
+        }
+      }
       if (this.type === 1 || this.type === 2 || this.type === 3) {
         series = [{
           data: data.map(ele => {
@@ -197,7 +212,7 @@ export default {
           show: (this.type !== 0)
         },
         grid: {
-          left: 25,
+          left: 35,
           right: 5
         },
         tooltip: {
@@ -211,9 +226,7 @@ export default {
             return ele.EndDate
           }).reverse()
         },
-        yAxis: {
-          type: 'value'
-        },
+        yAxis: yAxis,
         series: series
       }
       this.dom.setOption(option)
