@@ -91,6 +91,7 @@ export default {
   methods: {
     getData () {
       this.dom.showLoading()
+      this.dom.clear()
       api.req(this.dateRange[0], this.dateRange[1], this.fundid, (data) => {
         data = data.reverse()
         this.orgData = data
