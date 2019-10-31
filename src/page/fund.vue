@@ -79,8 +79,8 @@ export default {
       fundIds: [{
         label: '易方达美元货币基金',
         value: 'F00000ZQWJ',
-        hold: 67.3486,
-        cost: 7000
+        hold: 76.9228,
+        cost: 8000
       }, {
         label: '易方达全球债券基金A USD Acc',
         value: 'F00000YE6M',
