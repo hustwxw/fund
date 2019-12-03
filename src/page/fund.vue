@@ -40,7 +40,7 @@
       <el-col :span="5">
         <el-tag type="info">持有基金份额：{{hold}}</el-tag>
       </el-col>
-      <el-col :span="5">
+      <el-col :span="5" v-if="this.type === 0">
         <el-tag>综合年化收益率：{{zonghe}}%</el-tag>
       </el-col>
     </el-row>
@@ -145,6 +145,9 @@ export default {
   },
   methods: {
     computeRate (fundid) {
+      if (this.type !== 0) {
+        return false
+      }
       const endDate = this.orgData[0].EndDate
       const value = this.orgData[0].Value
       const find = this.fundIds.filter(ele => ele.value === fundid)
