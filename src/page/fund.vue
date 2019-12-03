@@ -156,6 +156,7 @@ export default {
         // 日志
         // console.log(`${days}-${change}-${yearRate}-${ele.buy}-${value}`)
         table.push({
+          '买入时刻': ele.date.format('YYYY-MM-DD'),
           '持有天数': days,
           '收益率': change + '%',
           '年化收益率': yearRate + '%',
