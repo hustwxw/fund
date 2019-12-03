@@ -92,33 +92,39 @@ export default {
           {
             date: moment('2019-07-29'),
             buy: 103.728,
-            num: 1000
+            num: 1000,
+            fee: 0.001
           },
           {
             date: moment('2019-08-05'),
             buy: 103.784,
-            num: 4000
+            num: 4000,
+            fee: 0.001
           },
           {
             date: moment('2019-08-13'),
             buy: 103.846,
-            num: 1000
+            num: 1000,
+            fee: 0.001
           },
           {
             date: moment('2019-09-24'),
             buy: 104.119,
-            num: 1000
+            num: 1000,
+            fee: 0.001
           },
           {
             date: moment('2019-10-30'),
             buy: 104.342,
-            num: 1000
+            num: 1000,
+            fee: 0.001
           }
           // ,
           // {
           //   date: moment('2019-11-22'),
           //   buy: 104.538,
-          //   num: 2000
+          //   num: 2000,
+          //    fee: 0.001
           // }
         ]
       }, {
@@ -130,7 +136,8 @@ export default {
           {
             date: moment('2019-08-05'),
             buy: 10.61,
-            num: 1000
+            num: 1000,
+            fee: 0.025
           }
         ]
       }]
@@ -161,7 +168,9 @@ export default {
           '收益率': change + '%',
           '年化收益率': yearRate + '%',
           '买入价格': ele.buy,
-          '当前最新价格': value - 0
+          '当前最新价格': value - 0,
+          '本金': ele.num,
+          '盈亏': Number(ele.num * (1 - ele.fee) / ele.buy * value - ele.num).toFixed(2) - 0
         })
         return ele
       })
