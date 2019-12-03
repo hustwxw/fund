@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row style="margin-bottom: 20px">
       <el-col :span="6">
         <el-date-picker
           v-model="dateRange"
@@ -8,6 +8,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          style="width:100%"
           value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-col>
@@ -34,8 +35,13 @@
       <el-col :span="2">
         <el-button type="primary" @click="query">查询</el-button>
       </el-col>
-      <el-col :span="3">
-        <el-tag>{{hold}}</el-tag>
+    </el-row>
+    <el-row>
+      <el-col :span="5">
+        <el-tag type="info">持有基金份额：{{hold}}</el-tag>
+      </el-col>
+      <el-col :span="5">
+        <el-tag>综合年化收益率：{{zonghe}}%</el-tag>
       </el-col>
     </el-row>
     <el-row>
@@ -56,9 +62,10 @@ export default {
       dom: null,
       // 原始数据
       orgData: null,
-      dateRange: ['2019-01-01', moment(moment.now()).format('YYYY-MM-DD')],
+      dateRange: ['2019-07-01', moment(moment.now()).format('YYYY-MM-DD')],
       type: 0,
       fundid: 'F00000ZQWJ',
+      zonghe: 0,
       hold: 0,
       options: [{
         label: '持有市值',
@@ -80,16 +87,86 @@ export default {
         label: '易方达美元货币基金',
         value: 'F00000ZQWJ',
         hold: 76.9228,
-        cost: 8000
+        cost: 8000,
+        invest: [
+          {
+            date: moment('2019-07-29'),
+            buy: 103.728,
+            num: 1000
+          },
+          {
+            date: moment('2019-08-05'),
+            buy: 103.784,
+            num: 4000
+          },
+          {
+            date: moment('2019-08-13'),
+            buy: 103.846,
+            num: 1000
+          },
+          {
+            date: moment('2019-09-24'),
+            buy: 104.119,
+            num: 1000
+          },
+          {
+            date: moment('2019-10-30'),
+            buy: 104.342,
+            num: 1000
+          }
+          // ,
+          // {
+          //   date: moment('2019-11-22'),
+          //   buy: 104.538,
+          //   num: 2000
+          // }
+        ]
       }, {
         label: '易方达全球债券基金A USD Acc',
         value: 'F00000YE6M',
         hold: 91.9500,
-        cost: 1000
+        cost: 1000,
+        invest: [
+          {
+            date: moment('2019-08-05'),
+            buy: 10.61,
+            num: 1000
+          }
+        ]
       }]
     }
   },
   methods: {
+    computeRate (fundid) {
+      const endDate = this.orgData[0].EndDate
+      const value = this.orgData[0].Value
+      const find = this.fundIds.filter(ele => ele.value === fundid)
+      const invest = find[0].invest
+      const table = []
+      let rates = 0
+      invest.map(ele => {
+        // 计算天数
+        const days = moment(endDate).diff(ele.date, 'days')
+        // 计算增长比率
+        const change = Number((value - ele.buy) / ele.buy * 100).toFixed(4)
+        // 年化率
+        const yearRate = Number(change / days * 365).toFixed(4)
+        // 计算权重
+        rates += yearRate - 0
+        // 日志
+        // console.log(`${days}-${change}-${yearRate}-${ele.buy}-${value}`)
+        table.push({
+          '持有天数': days,
+          '收益率': change + '%',
+          '年化收益率': yearRate + '%',
+          '买入价格': ele.buy,
+          '当前最新价格': value - 0
+        })
+        return ele
+      })
+      this.zonghe = Number(rates / invest.length).toFixed(4)
+      console.table(table)
+    },
     getData () {
       this.dom.showLoading()
       this.dom.clear()
@@ -97,6 +174,7 @@ export default {
         data = data.reverse()
         this.orgData = data
         this.renderEcharts(this.trasnformData(this.type))
+        this.computeRate(this.fundid)
       })
     },
     trasnformData (type) {
@@ -239,6 +317,9 @@ export default {
   mounted () {
     this.dom = window.echarts.init(this.$refs.chart)
     this.hold = this.fundIds[0].hold
+    window.onresize = () => {
+      this.dom.resize()
+    }
   }
 }
 </script>
