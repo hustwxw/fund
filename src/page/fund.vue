@@ -121,9 +121,9 @@ export default {
           },
           {
             date: moment('2019-12-03'),
-            buy: 104.538,
+            buy: 104.543,
             num: 2000,
-            fee: 0.002
+            fee: 0.001
           }
         ]
       }, {
