@@ -167,7 +167,7 @@ export default {
         table.push({
           '买入时刻': ele.date.format('YYYY-MM-DD'),
           '持有天数': days,
-          '收益率': change + '%',
+          '总收益率': change + '%',
           '年化收益率': yearRate + '%',
           '买入价格': ele.buy,
           '当前最新价格': value - 0,
