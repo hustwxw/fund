@@ -86,8 +86,8 @@ export default {
       fundIds: [{
         label: '易方达美元货币基金',
         value: 'F00000ZQWJ',
-        hold: 76.9228,
-        cost: 8000,
+        hold: 96.0345,
+        cost: 10000,
         invest: [
           {
             date: moment('2019-07-29'),
@@ -118,14 +118,13 @@ export default {
             buy: 104.342,
             num: 1000,
             fee: 0.001
+          },
+          {
+            date: moment('2019-12-03'),
+            buy: 104.538,
+            num: 2000,
+            fee: 0.002
           }
-          // ,
-          // {
-          //   date: moment('2019-11-22'),
-          //   buy: 104.538,
-          //   num: 2000,
-          //    fee: 0.001
-          // }
         ]
       }, {
         label: '易方达全球债券基金A USD Acc',
@@ -156,7 +155,7 @@ export default {
       let rates = 0
       invest.map(ele => {
         // 计算天数
-        const days = moment(endDate).diff(ele.date, 'days')
+        const days = Math.max(1, moment(endDate).diff(ele.date, 'days'))
         // 计算增长比率
         const change = Number((value - ele.buy) / ele.buy * 100).toFixed(4)
         // 年化率
