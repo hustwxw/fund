@@ -18,6 +18,13 @@ module.exports = {
         pathRewrite: {
           '^/data': ''
         }
+      },
+      '/ddfund': {
+        target: 'http://fundgz.1234567.com.cn',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/ddfund': ''
+        }
       }
     },
 

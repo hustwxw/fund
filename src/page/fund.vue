@@ -1,5 +1,20 @@
 <template>
   <div>
+    <el-row style="margin-bottom: 20px;border:1px solid #ddd;padding:20px;padding-left:0px">
+      <el-col :span="3">
+        实时估值
+      </el-col>
+      <el-col :span="21">
+        <el-row  v-for="fund in funds" v-bind:key="fund.fundcode">
+          <el-col :span="15">
+            <el-tag>{{fund.name}}</el-tag>
+            &nbsp;前值:{{fund.dwjz}}
+            &nbsp;当前估值:{{fund.gsz}}
+            &nbsp;变化率:{{fund.gszzl}}%
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
     <el-row style="margin-bottom: 20px">
       <el-col :span="6">
         <el-date-picker
@@ -51,6 +66,7 @@
 </template>
 
 <script>
+import jsonp from 'jsonp'
 import moment from 'moment'
 import _ from 'lodash'
 import api from '@/util/api'
@@ -58,6 +74,8 @@ export default {
   name: 'fund',
   data () {
     return {
+      // realTimeFund
+      funds: [],
       // 承载echarts的dom
       dom: null,
       // 原始数据
@@ -177,6 +195,7 @@ export default {
         return ele
       })
       this.zonghe = Number(rates / invest.length).toFixed(4)
+      console.log(`${find[0].label}投资情况`)
       console.table(table)
     },
     getData () {
@@ -324,6 +343,29 @@ export default {
     },
     query () {
       this.getData()
+    },
+    getSouthFund () {
+      // 160119 202101
+      const _inner = () => {
+        const ids = [202101, 160119]
+        ids.forEach((ele, index) => {
+          setTimeout(() => {
+            jsonp(`/ddfund/js/${ele}.js`, {
+              param: `rt=${new Date().valueOf()}`,
+              name: 'jsonpgz'
+            }, (err, data) => {
+              if (!err) {
+                this.funds.push(data)
+              }
+            })
+          }, index * 1000)
+        })
+      }
+      setInterval(() => {
+        this.funds.length = 0
+        _inner()
+      }, 60000)
+      _inner()
     }
   },
   mounted () {
@@ -332,6 +374,7 @@ export default {
     window.onresize = () => {
       this.dom.resize()
     }
+    this.getSouthFund()
   }
 }
 </script>
