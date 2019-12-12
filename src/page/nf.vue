@@ -59,13 +59,44 @@ export default {
     refresh () {
       this.funds = []
       this.loading = true
-      this.getApi().then(data => {
-        this.funds = data
+      this.getSHApi().then(data => {
+        this.funds.push(data)
         this.loading = false
-        console.log(this.funds)
+        this.getApi().then(data => {
+          this.funds = this.funds.concat(data)
+          this.loading = false
+        }).catch(err => {
+          this.loading = false
+          console.log(err)
+        })
       }).catch(err => {
         this.loading = false
         console.log(err)
+      })
+    },
+    getSHApi () {
+      return new Promise((resolve, reject) => {
+        jsonp(`http://api.k780.com/?app=finance.globalindex&inxids=1010&appkey=47313&sign=b3caabdab1bb5bbfefbc04c7e4e02490
+
+&format=json&jsoncallback=shdata`, {
+          name: 'shdata'
+        }, (err, data) => {
+          if (!err) {
+            resolve([data.result.lists['1010']].map(ele => {
+              return {
+                dwjz: ele.yesy_price,
+                jzrq: ele.uptime.split(' ')[0],
+                gsz: ele.last_price,
+                gztime: ele.uptime,
+                gszzl: parseFloat(ele.rise_fall_per),
+                name: ele.inxnm,
+                fundcode: ele.inxno
+              }
+            })[0])
+          } else {
+            reject(new Error(err))
+          }
+        })
       })
     },
     getApi () {
