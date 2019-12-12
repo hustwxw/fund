@@ -1,7 +1,7 @@
 <template>
   <el-row>
     <el-col :span="24" style="margin-bottom:20px;">
-      <h1>南方基金实时估算净值(一分钟刷新一次)</h1>&nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
+      <h1>重点关注市值实时估算净值(一分钟刷新一次)</h1>&nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
     </el-col>
     <el-table
       :data="funds"
@@ -11,11 +11,13 @@
       style="width: 100%">
       <el-table-column
         prop="fundcode"
-        label="基金代码">
+        label="代码">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="基金名称">
+        label="名称">
+        <template slot-scope="scope">
+          <div>{{scope.row.name}}【{{scope.row.type}}】</div>
+        </template>
       </el-table-column>
       <el-table-column
         label="涨跌幅">
@@ -61,7 +63,7 @@ export default {
       this.funds = []
       this.loading = true
       this.getSHApi().then(data => {
-        this.funds.push(data)
+        this.funds = this.funds.concat(data)
         this.loading = false
         this.getApi().then(data => {
           this.funds = this.funds.concat(data)
@@ -76,19 +78,25 @@ export default {
       })
     },
     getSHApi () {
+      const code = ['sh000001', 'sz002024']
+      const result = []
       return new Promise((resolve, reject) => {
-        loadjs(`https://web.sqt.gtimg.cn/utf8/q=sh000001&offset=1,2,3,4,31,32,33,38&r=${Math.random()}`, {
+        loadjs(`https://web.sqt.gtimg.cn/utf8/q=${code.join(',')}&offset=1,2,3,4,31,32,33,38&r=${Math.random()}`, {
           success: () => {
-            const data = window.v_sh000001.split('~')
-            resolve({
-              jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
-              dwjz: Number(parseFloat(data[3]) - 0 - parseFloat(data[5]) - 0).toFixed(2),
-              gsz: Number(parseFloat(data[3])).toFixed(2),
-              gztime: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)} ${data[4].substring(8, 10)}:${data[4].substring(10, 12)}`,
-              gszzl: data[6],
-              name: data[1],
-              fundcode: data[2]
+            code.forEach(ele => {
+              const data = window[`v_${ele}`].split('~')
+              result.push({
+                jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
+                dwjz: Number(parseFloat(data[3]) - 0 - parseFloat(data[5]) - 0).toFixed(2),
+                gsz: Number(parseFloat(data[3])).toFixed(2),
+                gztime: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)} ${data[4].substring(8, 10)}:${data[4].substring(10, 12)}`,
+                gszzl: data[6],
+                name: data[1],
+                fundcode: data[2],
+                type: '股票'
+              })
             })
+            resolve(result)
           },
           error: (err) => {
             reject(err)
@@ -106,6 +114,7 @@ export default {
             name: 'jsonpgz'
           }, (err, data) => {
             if (!err) {
+              data.type = '基金'
               resolve(data)
             } else {
               reject(new Error(err))
