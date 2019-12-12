@@ -77,13 +77,13 @@ export default {
     },
     getSHApi () {
       return new Promise((resolve, reject) => {
-        loadjs('http://web.sqt.gtimg.cn/utf8/q=sh000001&offset=1,2,3,4,31,32,33,38&r=0.79290506620242622', {
+        loadjs(`https://web.sqt.gtimg.cn/utf8/q=sh000001&offset=1,2,3,4,31,32,33,38&r=${Math.random()}`, {
           success: () => {
             const data = window.v_sh000001.split('~')
             resolve({
               jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
-              dwjz: parseFloat(data[3]) - 0 + parseFloat(data[5]) - 0,
-              gsz: parseFloat(data[3]),
+              dwjz: Number(parseFloat(data[3]) - 0 - parseFloat(data[5]) - 0).toFixed(2),
+              gsz: Number(parseFloat(data[3])).toFixed(2),
               gztime: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)} ${data[4].substring(8, 10)}:${data[4].substring(10, 12)}`,
               gszzl: data[6],
               name: data[1],
