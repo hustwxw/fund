@@ -73,7 +73,7 @@ export default {
       const ids = ['202101', '160119']
       const req = (fundCode) => {
         return new Promise((resolve, reject) => {
-          jsonp(`/ddfund/js/${fundCode}.js`, {
+          jsonp(`http://fundgz.1234567.com.cn/js/${fundCode}.js`, {
             param: `rt=${new Date().valueOf()}`,
             name: 'jsonpgz'
           }, (err, data) => {
