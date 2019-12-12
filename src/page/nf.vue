@@ -18,6 +18,14 @@
         label="基金名称">
       </el-table-column>
       <el-table-column
+        label="涨跌幅">
+        <template slot-scope="scope">
+          <div v-if="scope.row.gszzl > 0" style="color:red">{{scope.row.gszzl}}%<i class="el-icon-top"></i></div>
+          <div v-if="scope.row.gszzl === 0" style="color:black">{{scope.row.gszzl}}%</div>
+          <div v-if="scope.row.gszzl < 0" style="color:green">{{scope.row.gszzl}}%<i class="el-icon-bottom"></i></div>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="昨日净值">
         <template slot-scope="scope">
           <div>{{scope.row.dwjz}}【{{scope.row.jzrq}}】</div>
@@ -27,14 +35,6 @@
         label="实时净值（估算）">
         <template slot-scope="scope">
           <div>{{scope.row.gsz}}【{{scope.row.gztime}}】</div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="涨跌幅">
-        <template slot-scope="scope">
-          <div v-if="scope.row.gszzl > 0" style="color:red">{{scope.row.gszzl}}%<i class="el-icon-top"></i></div>
-          <div v-if="scope.row.gszzl === 0" style="color:black">{{scope.row.gszzl}}%</div>
-          <div v-if="scope.row.gszzl < 0" style="color:green">{{scope.row.gszzl}}%<i class="el-icon-bottom"></i></div>
         </template>
       </el-table-column>
     </el-table>
