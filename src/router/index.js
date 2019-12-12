@@ -8,12 +8,12 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/nf',
+      path: '/',
       name: 'nf',
       component: NF
     },
     {
-      path: '/',
+      path: '/solomonwu',
       name: 'Fund',
       component: Fund
     }
