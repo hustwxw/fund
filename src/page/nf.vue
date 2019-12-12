@@ -21,7 +21,7 @@
         label="涨跌幅">
         <template slot-scope="scope">
           <div v-if="scope.row.gszzl > 0" style="color:red">{{scope.row.gszzl}}%<i class="el-icon-top"></i></div>
-          <div v-if="scope.row.gszzl === 0" style="color:black">{{scope.row.gszzl}}%</div>
+          <div v-if="scope.row.gszzl == 0.00" style="color:black">{{scope.row.gszzl}}%</div>
           <div v-if="scope.row.gszzl < 0" style="color:green">{{scope.row.gszzl}}%<i class="el-icon-bottom"></i></div>
         </template>
       </el-table-column>
