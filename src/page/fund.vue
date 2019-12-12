@@ -6,11 +6,14 @@
       </el-col>
       <el-col :span="21">
         <el-row  v-for="fund in funds" v-bind:key="fund.fundcode">
-          <el-col :span="15">
+          <el-col :span="20">
             <el-tag>{{fund.name}}</el-tag>
             &nbsp;前值:{{fund.dwjz}}
             &nbsp;当前估值:{{fund.gsz}}
-            &nbsp;变化率:{{fund.gszzl}}%
+            &nbsp;变化率:
+              <el-tag type="danger" v-if="fund.gszzl < 0">{{fund.gszzl}}%</el-tag>
+              <el-tag type="success" v-if="fund.gszzl >= 0">{{fund.gszzl}}%</el-tag>
+            &nbsp;更新时间:{{fund.gztime}}
           </el-col>
         </el-row>
       </el-col>
@@ -347,7 +350,8 @@ export default {
     getSouthFund () {
       // 160119 202101
       const _inner = () => {
-        const ids = [202101, 160119]
+        // const ids = ['202101', '160119', '007733', '007628', '008038']
+        const ids = ['202101', '160119']
         ids.forEach((ele, index) => {
           setTimeout(() => {
             jsonp(`/ddfund/js/${ele}.js`, {
