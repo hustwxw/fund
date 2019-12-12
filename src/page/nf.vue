@@ -43,6 +43,7 @@
 
 <script>
 import jsonp from 'jsonp'
+import loadjs from 'loadjs'
 export default {
   name: 'nf',
   data () {
@@ -76,25 +77,21 @@ export default {
     },
     getSHApi () {
       return new Promise((resolve, reject) => {
-        jsonp(`http://api.k780.com/?app=finance.globalindex&inxids=1010&appkey=47313&sign=b3caabdab1bb5bbfefbc04c7e4e02490
-
-&format=json&jsoncallback=shdata`, {
-          name: 'shdata'
-        }, (err, data) => {
-          if (!err) {
-            resolve([data.result.lists['1010']].map(ele => {
-              return {
-                dwjz: ele.yesy_price,
-                jzrq: ele.uptime.split(' ')[0],
-                gsz: ele.last_price,
-                gztime: ele.uptime,
-                gszzl: parseFloat(ele.rise_fall_per),
-                name: ele.inxnm,
-                fundcode: ele.inxno
-              }
-            })[0])
-          } else {
-            reject(new Error(err))
+        loadjs('http://web.sqt.gtimg.cn/utf8/q=sh000001&offset=1,2,3,4,31,32,33,38&r=0.79290506620242622', {
+          success: () => {
+            const data = window.v_sh000001.split('~')
+            resolve({
+              jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
+              dwjz: parseFloat(data[3]) - 0 + parseFloat(data[5]) - 0,
+              gsz: parseFloat(data[3]),
+              gztime: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)} ${data[4].substring(8, 10)}:${data[4].substring(10, 12)}`,
+              gszzl: data[6],
+              name: data[1],
+              fundcode: data[2]
+            })
+          },
+          error: (err) => {
+            reject(err)
           }
         })
       })
