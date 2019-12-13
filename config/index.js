@@ -25,6 +25,13 @@ module.exports = {
         pathRewrite: {
           '^/ddfund': ''
         }
+      },
+      '/huilv': {
+        target: 'https://op.juhe.cn/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/huilv': ''
+        }
       }
     },
 

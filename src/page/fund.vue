@@ -61,6 +61,10 @@
       <el-col :span="5" v-if="this.type === 0">
         <el-tag>综合年化收益率：{{zonghe}}%</el-tag>
       </el-col>
+      <el-col :span="5" v-if="this.type === 0">
+        <el-tag>总收益：{{total}}$</el-tag>
+        <el-tag>总收益：{{totalUSD}}￥</el-tag>
+      </el-col>
     </el-row>
     <el-row>
       <div class="chart" ref="chart"></div>
@@ -77,6 +81,9 @@ export default {
   name: 'fund',
   data () {
     return {
+      // 总收益
+      total: 0,
+      totalUSD: 0,
       // realTimeFund
       funds: [],
       // 承载echarts的dom
@@ -168,6 +175,7 @@ export default {
       if (this.type !== 0) {
         return false
       }
+      this.total = 0
       const endDate = this.orgData[0].EndDate
       const value = this.orgData[0].Value
       const find = this.fundIds.filter(ele => ele.value === fundid)
@@ -185,6 +193,8 @@ export default {
         rates += yearRate - 0
         // 日志
         // console.log(`${days}-${change}-${yearRate}-${ele.buy}-${value}`)
+        let t = Number(ele.num * (1 - ele.fee) / ele.buy * value - ele.num).toFixed(2) - 0
+        this.total += t
         table.push({
           '买入时刻': ele.date.format('YYYY-MM-DD'),
           '持有天数': days,
@@ -193,13 +203,22 @@ export default {
           '买入价格': ele.buy,
           '当前最新价格': value - 0,
           '本金': ele.num,
-          '盈亏': Number(ele.num * (1 - ele.fee) / ele.buy * value - ele.num).toFixed(2) - 0
+          '盈亏': t
         })
         return ele
       })
       this.zonghe = Number(rates / invest.length).toFixed(4)
       console.log(`${find[0].label}投资情况`)
       console.table(table)
+      // 算汇率
+      jsonp('/huilv/onebox/exchange/currency', {
+        param: `key=38e7f86e3dffff2dbf216d8d116d2dce&from=USD&to=CNY&callback=huilv`
+      }, (err, data) => {
+        if (!err) {
+          const find = data.result.filter(ele => ele.currencyF === 'USD')
+          this.totalUSD = Number(this.total * find[0].exchange).toFixed(2)
+        }
+      })
     },
     getData () {
       this.dom.showLoading()

@@ -63,19 +63,23 @@ export default {
       this.funds = []
       this.loading = true
       this.getSHApi().then(data => {
-        this.funds = this.funds.concat(data)
-        this.loading = false
+        this.setFunds(data)
         this.getApi().then(data => {
-          this.funds = this.funds.concat(data)
-          this.loading = false
+          this.setFunds(data)
         }).catch(err => {
-          this.loading = false
-          console.log(err)
+          this.catchErr(err)
         })
       }).catch(err => {
-        this.loading = false
-        console.log(err)
+        this.catchErr(err)
       })
+    },
+    setFunds (data = []) {
+      this.funds = this.funds.concat(data)
+      this.loading = false
+    },
+    catchErr (err) {
+      this.loading = false
+      console.log(err)
     },
     getSHApi () {
       const code = ['sh000001', 'sz002024']
