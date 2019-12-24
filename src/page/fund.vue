@@ -58,8 +58,9 @@
       <el-col :span="5">
         <el-tag type="info">持有基金份额：{{hold}}</el-tag>
       </el-col>
-      <el-col :span="5" v-if="this.type === 0">
-        <el-tag>综合年化收益率：{{zonghe}}%</el-tag>
+      <el-col :span="8" v-if="this.type === 0">
+        <el-tag>净值年化收益率：{{zonghe}}%</el-tag>
+        <el-tag>投资年化收益率：{{zonghe2}}%</el-tag>
       </el-col>
       <el-col :span="5" v-if="this.type === 0">
         <el-tag>总收益：{{total}}$</el-tag>
@@ -94,6 +95,7 @@ export default {
       type: 0,
       fundid: 'F00000ZQWJ',
       zonghe: 0,
+      zonghe2: 0,
       hold: 0,
       options: [{
         label: '持有市值',
@@ -198,18 +200,23 @@ export default {
         table.push({
           '买入时刻': ele.date.format('YYYY-MM-DD'),
           '持有天数': days,
-          '总收益率': change + '%',
-          '年化收益率': yearRate + '%',
+          '净值总收益率': change + '%',
+          '净值年化收益率': yearRate + '%',
+          '投资总收益率': Number(t / ele.num * 100).toFixed(4) + '%',
+          '投资年化收益率': Number((t / ele.num * 100) * 365 / days).toFixed(4) + '%',
           '买入价格': ele.buy,
           '当前最新价格': value - 0,
+          '份额': Number((ele.num * (1 - ele.fee)) / ele.buy).toFixed(4),
           '本金': ele.num,
           '盈亏': t
         })
         return ele
       })
       this.zonghe = Number(rates / invest.length).toFixed(4)
+      this.zonghe2 = Number(_.sum(table.map(ele => parseFloat(ele['投资年化收益率']))) / invest.length).toFixed(4)
       console.log(`${find[0].label}投资情况`)
       console.table(table)
+      console.log(_.sum(table.map(ele => ele['盈亏'])))
       // 算汇率
       jsonp('/huilv/onebox/exchange/currency', {
         param: `key=38e7f86e3dffff2dbf216d8d116d2dce&from=USD&to=CNY&callback=huilv`
