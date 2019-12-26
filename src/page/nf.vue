@@ -1,7 +1,8 @@
 <template>
   <el-row>
     <el-col :span="24" style="margin-bottom:20px;">
-      <h1>重点关注市值实时估算净值(一分钟刷新一次)</h1>&nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
+      <!-- <h1>重点关注市值实时估算净值(一分钟刷新一次)</h1> -->
+      &nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
     </el-col>
     <el-table
       :data="funds"
@@ -30,7 +31,7 @@
       <el-table-column
         label="昨日净值">
         <template slot-scope="scope">
-          <div>{{scope.row.dwjz}}【{{scope.row.jzrq}}】</div>
+          <div>{{scope.row.dwjz}}【{{jzrq}}】</div>
         </template>
       </el-table-column>
       <el-table-column
@@ -51,7 +52,8 @@ export default {
   data () {
     return {
       funds: [],
-      loading: false
+      loading: false,
+      jzrq: ''
     }
   },
   mounted () {
@@ -90,7 +92,7 @@ export default {
             code.forEach(ele => {
               const data = window[`v_${ele}`].split('~')
               result.push({
-                jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
+                // jzrq: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)}`,
                 dwjz: Number(parseFloat(data[3]) - 0 - parseFloat(data[5]) - 0).toFixed(2),
                 gsz: Number(parseFloat(data[3])).toFixed(2),
                 gztime: `${data[4].substring(0, 4)}-${data[4].substring(4, 6)}-${data[4].substring(6, 8)} ${data[4].substring(8, 10)}:${data[4].substring(10, 12)}`,
@@ -119,6 +121,7 @@ export default {
           }, (err, data) => {
             if (!err) {
               data.type = '基金'
+              this.jzrq = data.jzrq
               resolve(data)
             } else {
               reject(new Error(err))

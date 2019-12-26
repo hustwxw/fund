@@ -62,9 +62,10 @@
         <el-tag>净值年化收益率：{{zonghe}}%</el-tag>
         <el-tag>投资年化收益率：{{zonghe2}}%</el-tag>
       </el-col>
-      <el-col :span="5" v-if="this.type === 0">
+      <el-col :span="8" v-if="this.type === 0">
         <el-tag>总收益：{{total}}$</el-tag>
         <el-tag>总收益：{{totalUSD}}￥</el-tag>
+        <el-tag>汇率：{{rate}}</el-tag>
       </el-col>
     </el-row>
     <el-row>
@@ -85,6 +86,7 @@ export default {
       // 总收益
       total: 0,
       totalUSD: 0,
+      rate: 0,
       // realTimeFund
       funds: [],
       // 承载echarts的dom
@@ -212,6 +214,7 @@ export default {
         })
         return ele
       })
+      this.total = Number(this.total).toFixed(2)
       this.zonghe = Number(rates / invest.length).toFixed(4)
       this.zonghe2 = Number(_.sum(table.map(ele => parseFloat(ele['投资年化收益率']))) / invest.length).toFixed(4)
       console.log(`${find[0].label}投资情况`)
@@ -223,6 +226,7 @@ export default {
       }, (err, data) => {
         if (!err) {
           const find = data.result.filter(ele => ele.currencyF === 'USD')
+          this.rate = find[0].exchange
           this.totalUSD = Number(this.total * find[0].exchange).toFixed(2)
         }
       })
