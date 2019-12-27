@@ -205,7 +205,9 @@ export default {
           '净值总收益率': change + '%',
           '净值年化收益率': yearRate + '%',
           '投资总收益率': Number(t / ele.num * 100).toFixed(4) + '%',
+          '拟合度1': Number(t / ele.num * 100 / change * 100).toFixed(4) + '%',
           '投资年化收益率': Number((t / ele.num * 100) * 365 / days).toFixed(4) + '%',
+          '拟合度2': Number((t / ele.num * 100) * 365 / days / yearRate * 100).toFixed(4) + '%',
           '买入价格': ele.buy,
           '当前最新价格': value - 0,
           '份额': Number((ele.num * (1 - ele.fee)) / ele.buy).toFixed(4),
@@ -219,7 +221,8 @@ export default {
       this.zonghe2 = Number(_.sum(table.map(ele => parseFloat(ele['投资年化收益率']))) / invest.length).toFixed(4)
       console.log(`${find[0].label}投资情况`)
       console.table(table)
-      console.log(_.sum(table.map(ele => ele['盈亏'])))
+      console.log(Number(_.sum(table.map(ele => ele['盈亏']))).toFixed(2))
+      console.log('拟合度约接近100%说明越可以忽略买入手续费对收益的影响')
       // 算汇率
       jsonp('/huilv/onebox/exchange/currency', {
         param: `key=38e7f86e3dffff2dbf216d8d116d2dce&from=USD&to=CNY&callback=huilv`
@@ -408,7 +411,7 @@ export default {
     window.onresize = () => {
       this.dom.resize()
     }
-    this.getSouthFund()
+    // this.getSouthFund()
   }
 }
 </script>
