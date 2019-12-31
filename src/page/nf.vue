@@ -4,6 +4,16 @@
       <!-- <h1>重点关注市值实时估算净值(一分钟刷新一次)</h1> -->
       &nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
     </el-col>
+    <el-col :span="4" style="margin-bottom: 10px">
+      <el-select v-model="sortval" placeholder="请选择" @change="onSort" style="width:100%">
+        <el-option
+          v-for="item in sorts"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </el-col>
     <el-table
       :data="funds"
       v-loading="loading"
@@ -12,6 +22,7 @@
       style="width: 100%">
       <el-table-column
         prop="fundcode"
+        width="100"
         label="代码">
       </el-table-column>
       <el-table-column
@@ -21,6 +32,7 @@
         </template>
       </el-table-column>
       <el-table-column
+        width="150"
         label="涨跌幅">
         <template slot-scope="scope">
           <div v-if="scope.row.gszzl > 0" style="color:red">{{scope.row.gszzl}}%<i class="el-icon-top"></i></div>
@@ -53,7 +65,18 @@ export default {
     return {
       funds: [],
       loading: false,
-      jzrq: ''
+      jzrq: '',
+      sortval: 0,
+      sorts: [
+        {
+          label: '涨幅从高到低',
+          value: 0
+        },
+        {
+          label: '涨幅从低到高',
+          value: 1
+        }
+      ]
     }
   },
   mounted () {
@@ -61,6 +84,13 @@ export default {
     setInterval(this.refresh, 60000)
   },
   methods: {
+    onSort (val) {
+      if (val === 0) {
+        this.funds.sort((a, b) => b.gszzl - a.gszzl)
+      } else if (val === 1) {
+        this.funds.sort((a, b) => a.gszzl - b.gszzl)
+      }
+    },
     refresh () {
       this.funds = []
       this.loading = true
@@ -68,6 +98,8 @@ export default {
         this.setFunds(data)
         this.getApi().then(data => {
           this.setFunds(data)
+          this.sortval = 0
+          this.onSort(0)
         }).catch(err => {
           this.catchErr(err)
         })
@@ -112,7 +144,7 @@ export default {
     },
     getApi () {
       const funds = []
-      const ids = ['202101', '160119', '000452']
+      const ids = ['202101', '160119', '000452', '007733']
       const req = (fundCode) => {
         return new Promise((resolve, reject) => {
           jsonp(`https://fundgz.1234567.com.cn/js/${fundCode}.js`, {
