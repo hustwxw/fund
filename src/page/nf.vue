@@ -41,15 +41,15 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="昨日净值">
-        <template slot-scope="scope">
-          <div>{{scope.row.dwjz}}【{{jzrq}}】</div>
-        </template>
-      </el-table-column>
-      <el-table-column
         label="实时净值（估算）">
         <template slot-scope="scope">
           <div>{{scope.row.gsz}}【{{scope.row.gztime}}】</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="昨日净值">
+        <template slot-scope="scope">
+          <div>{{scope.row.dwjz}}【{{jzrq}}】</div>
         </template>
       </el-table-column>
     </el-table>
@@ -116,7 +116,7 @@ export default {
       console.log(err)
     },
     getSHApi () {
-      const code = ['sh000001', 'sz002024']
+      const code = ['sh000001', 'sz002024', 'sh000808']
       const result = []
       return new Promise((resolve, reject) => {
         loadjs(`https://web.sqt.gtimg.cn/utf8/q=${code.join(',')}&offset=1,2,3,4,31,32,33,38&r=${Math.random()}`, {

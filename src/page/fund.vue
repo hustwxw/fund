@@ -156,6 +156,12 @@ export default {
             buy: 104.543,
             num: 2000,
             fee: 0.001
+          },
+          {
+            date: moment('2020-01-03'),
+            buy: 104.734,
+            num: 2000,
+            fee: 0.001
           }
         ]
       }, {
