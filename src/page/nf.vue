@@ -4,7 +4,7 @@
       <!-- <h1>重点关注市值实时估算净值(一分钟刷新一次)</h1> -->
       &nbsp;<el-button type="primary" @click="refresh"><i class="el-icon-refresh"></i>刷新</el-button>
     </el-col>
-    <el-col :span="4" style="margin-bottom: 10px">
+    <el-col :span="8" style="margin-bottom: 10px">
       <el-select v-model="sortval" placeholder="请选择" @change="onSort" style="width:100%">
         <el-option
           v-for="item in sorts"
@@ -144,7 +144,7 @@ export default {
     },
     getApi () {
       const funds = []
-      const ids = ['202101', '160119', '000452', '007733', '202015']
+      const ids = ['202101', '160119', '000452', '007733', '202015', '008037']
       const req = (fundCode) => {
         return new Promise((resolve, reject) => {
           jsonp(`https://fundgz.1234567.com.cn/js/${fundCode}.js`, {
