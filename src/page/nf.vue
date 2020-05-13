@@ -144,7 +144,7 @@ export default {
     },
     getApi () {
       const funds = []
-      const ids = ['202101', '160119', '000452', '007733', '202015', '008037']
+      const ids = ['202101', '160119', '000452', '007733', '202015', '008037', '202011', '003956']
       const req = (fundCode) => {
         return new Promise((resolve, reject) => {
           jsonp(`https://fundgz.1234567.com.cn/js/${fundCode}.js`, {
