@@ -14,6 +14,9 @@
         </el-option>
       </el-select>
     </el-col>
+    <el-col :span="4" style="margin-bottom: 10px">
+      日预估：{{days}}
+    </el-col>
     <el-table
       :data="funds"
       v-loading="loading"
@@ -38,6 +41,15 @@
           <div v-if="scope.row.gszzl > 0" style="color:red">{{scope.row.gszzl}}%<i class="el-icon-top"></i></div>
           <div v-if="scope.row.gszzl == 0.00" style="color:black">{{scope.row.gszzl}}%</div>
           <div v-if="scope.row.gszzl < 0" style="color:green">{{scope.row.gszzl}}%<i class="el-icon-bottom"></i></div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        width="150"
+        label="预估涨跌值">
+        <template slot-scope="scope">
+          <div v-if="scope.row.money > 0" style="color:red">{{scope.row.money}}<i class="el-icon-top"></i></div>
+          <div v-if="scope.row.money == 0.00" style="color:black">{{scope.row.money}}</div>
+          <div v-if="scope.row.money < 0" style="color:green">{{scope.row.money}}<i class="el-icon-bottom"></i></div>
         </template>
       </el-table-column>
       <el-table-column
@@ -67,6 +79,7 @@ export default {
       loading: false,
       jzrq: '',
       sortval: 0,
+      days: 0,
       sorts: [
         {
           label: '涨幅从高到低',
@@ -93,6 +106,7 @@ export default {
     },
     refresh () {
       this.funds = []
+      this.days = 0
       this.loading = true
       this.getSHApi().then(data => {
         this.setFunds(data)
@@ -144,7 +158,19 @@ export default {
     },
     getApi () {
       const funds = []
-      const ids = ['202101', '160119', '000452', '007733', '202015', '008037', '202011', '003956']
+      const ids = ['202101', '160119', '000452', '007733', '202015', '202011', '003956', '000527', '009318', '007340']
+      const counts = {
+        '202101': 26434.33,
+        '007733': 37735.38,
+        '000452': 5326.07,
+        '009318': 14825.36,
+        '160119': 6314.80,
+        '202015': 4065.63,
+        '202011': 4006.31,
+        '007340': 2110.59,
+        '003956': 537.31,
+        '000527': 135.82
+      }
       const req = (fundCode) => {
         return new Promise((resolve, reject) => {
           jsonp(`https://fundgz.1234567.com.cn/js/${fundCode}.js`, {
@@ -153,6 +179,8 @@ export default {
           }, (err, data) => {
             if (!err) {
               data.type = '基金'
+              data.money = Number(counts[fundCode] * data.gsz * (1 - 1 / (1 + data.gszzl / 100))).toFixed(2)
+              this.days += data.money - 0
               this.jzrq = data.jzrq
               resolve(data)
             } else {
