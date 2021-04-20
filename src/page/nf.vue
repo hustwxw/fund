@@ -14,8 +14,10 @@
         </el-option>
       </el-select>
     </el-col>
-    <el-col :span="6" style="margin-bottom: 10px">
-      日预估：{{days}}
+    <el-col :span="12" style="margin-bottom: 10px">
+      日预估：{{Number(days[0] + days[1]).toFixed(2) - 0}}
+      南方日预估：{{Number(days[0]).toFixed(2) - 0}}
+      广发日预估：{{Number(days[1]).toFixed(2) - 0}}
     </el-col>
     <el-table
       :data="funds"
@@ -84,7 +86,7 @@ export default {
       loading: false,
       jzrq: '',
       sortval: 0,
-      days: 0,
+      days: [0, 0],
       sorts: [
         {
           label: '涨幅从高到低',
@@ -111,7 +113,7 @@ export default {
     },
     refresh () {
       this.funds = []
-      this.days = 0
+      this.days = [0, 0]
       this.loading = true
       this.getSHApi().then(data => {
         this.setFunds(data)
@@ -199,7 +201,11 @@ export default {
               data.company = type
               data.type = '基金'
               data.money = Number(counts[fundCode] * data.gsz * (1 - 1 / (1 + data.gszzl / 100))).toFixed(2)
-              this.days += isNaN(data.money) ? 0 : data.money - 0
+              const index = {
+                '南方': 0,
+                '广发': 1
+              }[type]
+              this.days[index] += isNaN(data.money) ? 0 : data.money - 0
               this.jzrq = data.jzrq
               resolve(data)
             } else {
