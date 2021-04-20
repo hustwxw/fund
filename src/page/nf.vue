@@ -14,7 +14,7 @@
         </el-option>
       </el-select>
     </el-col>
-    <el-col :span="4" style="margin-bottom: 10px">
+    <el-col :span="6" style="margin-bottom: 10px">
       日预估：{{days}}
     </el-col>
     <el-table
@@ -27,6 +27,11 @@
         prop="fundcode"
         width="100"
         label="代码">
+      </el-table-column>
+      <el-table-column
+        prop="company"
+        width="100"
+        label="公司">
       </el-table-column>
       <el-table-column
         label="名称">
@@ -158,7 +163,13 @@ export default {
     },
     getApi () {
       const funds = []
-      const ids = ['202101', '160119', '000452', '007733', '202015', '202011', '003956', '000527', '009318', '007340']
+      const ids = ['202101', '160119', '000452', '007733', '202015', '202011', '003956', '000527', '009318', '007340'].map(fundCode => ({
+        fundCode,
+        type: '南方'
+      })).concat(['010379', '008903', '004851', '005402', '006595', '005223', '000215'].map(fundCode => ({
+        fundCode,
+        type: '广发'
+      })))
       const counts = {
         '202101': 26434.33,
         '007733': 37735.38,
@@ -169,22 +180,30 @@ export default {
         '202011': 4006.31,
         '007340': 2110.59,
         '003956': 537.31,
-        '000527': 135.82
+        '000527': 135.82,
+        '010379': 5027.10,
+        '008903': 1744.84,
+        '004851': 652.31,
+        '005402': 586.94,
+        '006595': 1396.30,
+        '005223': 2944.34,
+        '00215': 153.53
       }
-      const req = (fundCode) => {
+      const req = ({fundCode, type}) => {
         return new Promise((resolve, reject) => {
           jsonp(`https://fundgz.1234567.com.cn/js/${fundCode}.js`, {
             param: `rt=${new Date().valueOf()}`,
             name: 'jsonpgz'
           }, (err, data) => {
             if (!err) {
+              data.company = type
               data.type = '基金'
               data.money = Number(counts[fundCode] * data.gsz * (1 - 1 / (1 + data.gszzl / 100))).toFixed(2)
-              this.days += data.money - 0
+              this.days += isNaN(data.money) ? 0 : data.money - 0
               this.jzrq = data.jzrq
               resolve(data)
             } else {
-              reject(new Error(err))
+              reject(new Error(err + fundCode))
             }
           })
         })
