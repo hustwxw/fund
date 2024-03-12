@@ -1,0 +1,46 @@
+<html>
+  <title>基金净值实时估算查询（数据来源天天基金网）</title>
+  <body>
+    <script>
+      function query () {
+        const code = document.getElementById('code').value?.trim()
+        if (!code) {
+          alert('请输入基金代码')
+          return
+        }
+        const requestScript = document.getElementById('request')
+        if (requestScript) {
+          document.body.removeChild(requestScript)
+        }
+        const script = document.createElement('script')
+        script.id = 'request'
+        script.src = `https://fundgz.1234567.com.cn/js/${document.getElementById('code').value}.js?rt=${new Date().valueOf()}=jsonpgz`
+        document.body.appendChild(script)
+      }
+      function jsonpgz(data) {
+        const template = 
+          `
+            <table border="2">
+              <tr>
+                <th>基金代码</th>
+                <th>基金名字</th>
+                <th>前日净值(${data.jzrq})</th>
+                <th>今日估算净值(${data.gztime})</th>
+                <th>今日估算涨跌幅</th>
+              </tr>
+              <tr>
+                <td>${data.fundcode}</td>
+                <td>${data.name}</td>
+                <td>${data.dwjz}</td>
+                <td>${data.gsz}</td>
+                <td>${data.gszzl}</td>
+              </tr>
+            </table>
+          `
+        document.getElementById('result').innerHTML = template
+      }
+    </script>
+    <input id="code" placeholder="请输入基金代码" value="018991"/><button onclick="query()">查询</button>
+    <div id="result" style="margin-top: 20px"></div>
+  </body>
+<html>
