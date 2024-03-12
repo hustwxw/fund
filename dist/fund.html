@@ -12,6 +12,8 @@
         if (requestScript) {
           document.body.removeChild(requestScript)
         }
+        const result = document.getElementById('result')
+        result.innerHTML = '查询中...'
         const script = document.createElement('script')
         script.id = 'request'
         script.src = `https://fundgz.1234567.com.cn/js/${document.getElementById('code').value}.js?rt=${new Date().valueOf()}=jsonpgz`
